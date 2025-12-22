@@ -1,104 +1,221 @@
-/* CSS Variables for Theme Management */
+/* Ocean Professional Theme + Responsive No-Scroll Grid Layout */
+
+/* Theme variables derived from style guide */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --primary: #2563EB;         /* Blue */
+  --secondary: #F59E0B;       /* Amber */
+  --background: #f9fafb;      /* Light gray */
+  --surface: #ffffff;         /* White card background */
+  --text: #111827;            /* Near-black */
+  --muted: #6b7280;           /* Gray text */
+  --shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+
+  /* Layout variables */
+  --grid-gap: clamp(6px, 1.2vmin, 16px);
+  --container-pad: clamp(8px, 2vmin, 20px);
+  --min-col: 180px; /* adjusted via media queries */
 }
 
+/* Dark theme support toggled by App button */
 [data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+  --background: #0f172a;
+  --surface: #0b1220;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --shadow: 0 10px 22px rgba(0,0,0,0.4);
 }
 
+/* Global: ensure app occupies full viewport and no scrollbars appear */
+html, body, #root {
+  height: 100%;
+  overflow: hidden; /* Prevent any scrollbars globally */
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+/* App wrapper */
 .App {
-  text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  height: 100%;
+  position: relative;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Top bar for title - slim to preserve vertical space */
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--container-pad) - 2px) var(--container-pad);
+  height: clamp(36px, 6vh, 52px);
+  box-sizing: border-box;
+  color: var(--text);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Title with subtle gradient accent */
+.app-title {
+  margin: 0;
+  font-size: clamp(14px, 2.2vmin, 20px);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.App-header {
-  background-color: var(--bg-secondary);
-  min-height: 100vh;
+/* Grid container: exactly 5 explicit rows, columns are auto-fit with min width,
+   and height is computed to fit 100vh minus topbar and paddings.
+   This guarantees no vertical scrollbar. */
+.grid-wrap {
+  /* Account for safe areas on mobile */
+  padding: calc(var(--container-pad) + env(safe-area-inset-top) / 4)
+           calc(var(--container-pad) + env(safe-area-inset-right) / 4)
+           calc(var(--container-pad) + env(safe-area-inset-bottom) / 4)
+           calc(var(--container-pad) + env(safe-area-inset-left) / 4);
+
+  display: grid;
+  grid-auto-flow: row;
+  gap: var(--grid-gap);
+
+  /* Encourage as many columns as fit; min col width changes with viewport via media queries */
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-col), 1fr));
+
+  /* Exactly 5 rows; each row is equal height (1fr) so all 25 visible without vertical scroll */
+  grid-template-rows: repeat(5, 1fr);
+
+  box-sizing: border-box;
+
+  /* Compute height: full viewport minus the topbar height */
+  height: calc(100vh - clamp(36px, 6vh, 52px));
+}
+
+/* Card styling: minimalist, rounded, subtle shadow */
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(2, 6, 23, 0.06);
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  /* Use internal padding that scales with viewport */
+  padding: clamp(8px, 1.8vmin, 16px);
+
+  /* Smooth scale when grid shrinks to maintain readability */
+  min-width: 0;
+}
+
+/* Card header/value */
+.card-title {
+  font-size: clamp(10px, 1.6vmin, 13px);
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: clamp(4px, 0.8vmin, 8px);
+}
+
+.card-value {
+  font-size: clamp(14px, 2.4vmin, 20px);
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Floating Mic Button: fixed to bottom-right, respects safe-area insets */
+.mic-btn {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: clamp(42px, 7vmin, 56px);
+  height: clamp(42px, 7vmin, 56px);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: radial-gradient(120% 120% at 30% 30%, var(--primary) 0%, #1e3a8a 100%);
+  color: #fff;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
-  position: relative;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35), inset 0 0 0 2px rgba(255,255,255,0.08);
+  z-index: 20;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.3s ease;
 }
 
-.App-link {
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
+.mic-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.45), inset 0 0 0 2px rgba(255,255,255,0.1);
 }
 
+.mic-btn:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+.mic-btn:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* Theme toggle button styling (kept from original, adjusted to theme) */
 .theme-toggle {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
+  top: 12px;
+  right: 12px;
+  background-color: var(--primary);
+  color: #ffffff;
   border: none;
   border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 8px 14px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  z-index: 15;
 }
 
 .theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+  transform: translateY(-1px);
+  opacity: 0.95;
 }
 
 .theme-toggle:active {
   transform: translateY(0);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Responsive tuning:
+   We adjust --min-col to encourage fewer columns on smaller viewports while
+   the grid still guarantees exactly 5 rows, keeping 25 items visible without scroll.
+*/
+@media (max-width: 1440px) {
+  :root { --min-col: 200px; }
 }
 
-/* Responsive design for mobile */
+@media (max-width: 1280px) {
+  :root { --min-col: 190px; }
+}
+
+@media (max-width: 1024px) {
+  :root { --min-col: 170px; }
+}
+
+@media (max-width: 900px) {
+  :root { --min-col: 160px; }
+}
+
 @media (max-width: 768px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
-  }
+  :root { --min-col: 140px; }
+}
+
+@media (max-width: 640px) {
+  :root { --min-col: 120px; }
+}
+
+@media (max-width: 480px) {
+  :root { --min-col: 100px; }
 }
